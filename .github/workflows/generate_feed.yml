@@ -2,10 +2,12 @@ name: Generate Channable Feed
 
 on:
   schedule:
-    - cron: '0 3 * * *'
+    - cron: '0 1  * * *'   # 01h00 UTC
+    - cron: '0 7  * * *'   # 07h00 UTC
+    - cron: '0 13 * * *'   # 13h00 UTC
+    - cron: '0 19 * * *'   # 19h00 UTC
   workflow_dispatch:
 
-# ── Permission d'écriture dans le repo ───────────────────────────────────────
 permissions:
   contents: write
 
