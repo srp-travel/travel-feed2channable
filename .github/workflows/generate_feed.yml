@@ -2,27 +2,36 @@ name: Generate Channable Feed
 
 on:
   schedule:
-    - cron: '0 3 * * *'   # tous les jours à 3h UTC
-  workflow_dispatch:        # déclenchement manuel possible
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+# ── Permission d'écriture dans le repo ───────────────────────────────────────
+permissions:
+  contents: write
 
 jobs:
   generate:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: actions/setup-python@v5
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
       - name: Install dependencies
         run: pip install httpx
 
-      - name: Generate feed
+      - name: Generate feed.json
         env:
           XML_AUTH_USER: ${{ secrets.XML_AUTH_USER }}
           XML_AUTH_PASS: ${{ secrets.XML_AUTH_PASS }}
+          XML_URL: https://voyage.showroomprive.com/export/sales_extended.xml
         run: python main.py
 
       - name: Commit and push feed.json
@@ -30,5 +39,5 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add feed.json
-          git diff --staged --quiet || git commit -m "chore: update feed.json [$(date -u '+%Y-%m-%d %H:%M')]"
+          git diff --staged --quiet || git commit -m "chore: update feed.json [$(date -u '+%Y-%m-%d %H:%M UTC')]"
           git push
